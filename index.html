@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拒绝酒驾 · 平安回家</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 24px;
+            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+            background: radial-gradient(circle at 50% 20%, #1a2b4a 0%, #0d1b2a 45%, #060d18 100%);
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        /* 顶部警示图标 */
+        .icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* 主标题：醒目 */
+        .title {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.35;
+            letter-spacing: 2px;
+            background: linear-gradient(180deg, #ffd54f 0%, #ffb300 60%, #ff8f00 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 180, 0, 0.35);
+            margin-bottom: 24px;
+        }
+
+        /* 副标题 */
+        .subtitle {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #e8eef7;
+            margin-bottom: 60px;
+        }
+
+        .subtitle .highlight {
+            color: #ffd54f;
+        }
+
+        /* 按钮容器 */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        /* 按钮通用 */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px 0;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn .logo {
+            font-size: 24px;
+        }
+
+        /* 高德按钮 */
+        .btn-amap {
+            background: linear-gradient(135deg, #29b6f6 0%, #1e88e5 100%);
+            box-shadow: 0 8px 24px rgba(30, 136, 229, 0.45);
+        }
+
+        /* 滴滴按钮 */
+        .btn-didi {
+            background: linear-gradient(135deg, #ff9800 0%, #f4511e 100%);
+            box-shadow: 0 8px 24px rgba(244, 81, 30, 0.45);
+        }
+
+        /* 底部提示 */
+        .footer {
+            margin-top: 50px;
+            font-size: 14px;
+            color: #8899aa;
+            letter-spacing: 2px;
+        }
+
+        .footer .strong {
+            color: #ffd54f;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="icon">🚫🍷</div>
+
+    <div class="title">今晚这杯酒<br>别带到车里</div>
+
+    <div class="subtitle">喝酒不开车，开车<span class="highlight">找代驾</span></div>
+
+    <div class="btn-group">
+        <!-- 高德地图 -->
+        <button class="btn btn-amap" id="btn-amap">
+            <span class="logo">🗺️</span> 打开高德地图叫代驾
+        </button>
+        <!-- 滴滴 -->
+        <button class="btn btn-didi" id="btn-didi">
+            <span class="logo">🚗</span> 打开滴滴叫代驾
+        </button>
+    </div>
+
+    <div class="footer">安全是回家最近的路 · <span class="strong">拒绝酒驾</span></div>
+
+    <script>
+        // 检测平台
+        function getPlatform() {
+            var ua = navigator.userAgent;
+            if (/Android/i.test(ua)) return 'android';
+            if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+            return 'other';
+        }
+
+        // 唤起 App，若未安装则降级跳转网页版
+        function openApp(scheme, fallbackUrl, timeout) {
+            var platform = getPlatform();
+            var hidden = false;
+
+            function onVisibilityChange() {
+                if (document.hidden || document.webkitHidden) {
+                    hidden = true;
+                }
+            }
+            document.addEventListener('visibilitychange', onVisibilityChange);
+            document.addEventListener('webkitvisibilitychange', onVisibilityChange);
+
+            // 尝试唤起 App
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = scheme;
+            document.body.appendChild(iframe);
+
+            // 降级：一段时间后若页面仍在前台（App 未唤起），跳转网页版
+            setTimeout(function () {
+                document.removeEventListener('visibilitychange', onVisibilityChange);
+                document.removeEventListener('webkitvisibilitychange', onVisibilityChange);
+                document.body.removeChild(iframe);
+                if (!hidden && platform !== 'other') {
+                    window.location.href = fallbackUrl;
+                } else if (platform === 'other') {
+                    window.open(fallbackUrl, '_blank');
+                }
+            }, timeout || 2200);
+        }
+
+        // 高德地图：唤起 App，未安装跳高德网页版
+        document.getElementById('btn-amap').addEventListener('click', function () {
+            var platform = getPlatform();
+            var scheme = (platform === 'ios') ? 'iosamap://' : 'androidamap://';
+            if (platform === 'other') scheme = 'amap://';
+            openApp(scheme, 'https://ditu.amap.com/', 2200);
+        });
+
+        // 滴滴：唤起 App，未安装跳滴滴网页版
+        document.getElementById('btn-didi').addEventListener('click', function () {
+            openApp('didi://', 'https://common.diditaxi.com.cn/', 2200);
+        });
+    </script>
+</body>
+</html>
